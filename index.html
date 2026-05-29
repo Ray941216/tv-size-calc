@@ -11,6 +11,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="google-adsense-account" content="ca-pub-7714309118972764" />
   <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
   <link rel="apple-touch-icon" href="./icons/icon-180.png" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7714309118972764"
     crossorigin="anonymous"></script>
@@ -75,11 +77,23 @@
       padding:11px 12px;
       outline:none;
     }
+    select{
+      -webkit-appearance:none;
+      -moz-appearance:none;
+      appearance:none;
+      width:100%;
+      padding-right:36px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%238bd3ff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 13px center;
+      background-size:12px 8px;
+    }
+    select::-ms-expand{display:none}
     input[type="range"]{width:100%;padding:0;accent-color:#8bd3ff}
     input:focus,select:focus{border-color:rgba(139,211,255,.75);box-shadow:0 0 0 3px rgba(139,211,255,.12)}
     select option{color:#07101f;background:#fff}
     .row{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:end}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr;gap:10px}
     .btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
     button{cursor:pointer;border-color:rgba(139,211,255,.25)}
     button:hover{background:rgba(139,211,255,.12)}
