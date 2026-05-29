@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>16:9 電視尺寸計算機｜劇院視角、內容偏好與品牌建議</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a32;
+      --panel2:#17213e;
+      --ink:#eaf0ff;
+      --muted:#aab6d8;
+      --line:rgba(255,255,255,.12);
+      --accent:#8bd3ff;
+      --accent2:#b8ffcf;
+      --warn:#ffd166;
+      --danger:#ff7b7b;
+      --ok:#98f5c2;
+      --shadow:0 18px 50px rgba(0,0,0,.35);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;
+      background:radial-gradient(circle at 18% 8%,rgba(139,211,255,.2),transparent 34%),radial-gradient(circle at 86% 0%,rgba(184,255,207,.15),transparent 30%),var(--bg);
+      color:var(--ink);
+      line-height:1.65;
+    }
+    a{color:var(--accent)}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 18px 64px}
+    .hero{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:20px;
+      align-items:stretch;
+      margin-bottom:20px;
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.035));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+      backdrop-filter:blur(12px);
+    }
+    h1,h2,h3{line-height:1.25;margin:0 0 12px}
+    h1{font-size:clamp(30px,5vw,58px);letter-spacing:-.04em}
+    h2{font-size:clamp(23px,3vw,34px);letter-spacing:-.02em;margin-top:12px}
+    h3{font-size:20px;color:#fff}
+    .sub{font-size:18px;color:var(--muted);max-width:68ch}
+    .pillrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .pill{border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);background:rgba(255,255,255,.035);font-size:13px}
+    .grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+    .controls{position:sticky;top:14px;z-index:2}
+    label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
+    input,select,button,textarea{
+      font:inherit;
+      border-radius:13px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--ink);
+      padding:11px 12px;
+      outline:none;
+    }
+    input[type="range"]{width:100%;padding:0;accent-color:#8bd3ff}
+    input:focus,select:focus{border-color:rgba(139,211,255,.75);box-shadow:0 0 0 3px rgba(139,211,255,.12)}
+    select option{color:#07101f;background:#fff}
+    .row{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:end}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
+    button{cursor:pointer;border-color:rgba(139,211,255,.25)}
+    button:hover{background:rgba(139,211,255,.12)}
+    .primary{background:linear-gradient(90deg,rgba(139,211,255,.22),rgba(184,255,207,.15));border-color:rgba(139,211,255,.48)}
+    .mini{font-size:12px;padding:7px 9px;color:var(--muted)}
+    .resultHero{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+    .metric{
+      background:linear-gradient(180deg,rgba(139,211,255,.12),rgba(255,255,255,.035));
+      border:1px solid rgba(139,211,255,.2);
+      border-radius:20px;
+      padding:18px;
+      min-height:132px;
+    }
+    .metric .k{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+    .metric .v{font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-.04em;margin-top:8px}
+    .metric .note{color:var(--muted);font-size:13px;margin-top:5px}
+    .notice{border-left:4px solid var(--warn);background:rgba(255,209,102,.08);padding:12px 14px;border-radius:12px;color:#ffe3a0;margin:12px 0}
+    .ok{border-left-color:var(--ok);background:rgba(152,245,194,.08);color:#caffdd}
+    .danger{border-left-color:var(--danger);background:rgba(255,123,123,.08);color:#ffc9c9}
+    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:16px}
+    th,td{border-bottom:1px solid var(--line);padding:11px 10px;text-align:left;vertical-align:top;font-size:14px}
+    th{color:#d8e5ff;background:rgba(255,255,255,.06);font-weight:700;position:sticky;top:0}
+    tr:hover td{background:rgba(255,255,255,.035)}
+    .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-size:12px;border:1px solid var(--line);color:var(--muted)}
+    .tag.warn{color:#ffe3a0;border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.08)}
+    .tag.oktag{color:#caffdd;border-color:rgba(152,245,194,.35);background:rgba(152,245,194,.08)}
+    .barwrap{height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:6px}
+    .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;width:30%}
+    .sliders{display:grid;gap:10px;margin-top:6px}
+    .sliderLine{display:grid;grid-template-columns:95px 1fr 46px;gap:9px;align-items:center;font-size:13px;color:var(--muted)}
+    .canvasBox{padding:0;overflow:hidden}
+    canvas{display:block;width:100%;height:260px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025))}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .sourceList{columns:2;column-gap:28px;color:var(--muted);font-size:13px}
+    .sourceList li{break-inside:avoid;margin:0 0 8px}
+    details{border:1px solid var(--line);border-radius:16px;padding:13px 15px;background:rgba(255,255,255,.03);margin:10px 0}
+    summary{cursor:pointer;font-weight:700;color:#fff}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#e8f7ff;background:rgba(255,255,255,.08);padding:2px 5px;border-radius:6px}
+    .footer{color:var(--muted);font-size:13px;margin-top:18px}
+    .printOnly{display:none}
+    @media (max-width:980px){
+      .hero,.grid,.two,.resultHero{grid-template-columns:1fr}
+      .controls{position:relative;top:auto}
+      .sourceList{columns:1}
+    }
+    @media print{
+      body{background:#fff;color:#111}
+      .card{box-shadow:none;border:1px solid #ddd;background:#fff;color:#111}
+      .controls,.btns,canvas{display:none!important}
+      .grid,.hero,.two,.resultHero{display:block}
+      a{color:#0645ad}
+      .printOnly{display:block}
+      th{background:#eee;color:#111}
+      td,th{border-color:#ddd}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="card">
+        <h1>16:9 電視尺寸計算機</h1>
+        <p class="sub">依據人眼到螢幕平面的距離，換算多種劇院／家庭影院／品牌建議模型的 16:9 斜對角尺寸；再把你的內容偏好納入加權，產生可落地的購買建議。</p>
+        <div class="pillrow">
+          <span class="pill">SMPTE / THX / Dolby / 品牌指南</span>
+          <span class="pill">內容偏好加權</span>
+          <span class="pill">21:9 電影黑邊分析</span>
+          <span class="pill">標準尺寸四捨五入</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>決策原則</h3>
+        <p>同一段距離不存在唯一正解。新聞、YouTube、劇集、電影、遊戲與 21:9 寬銀幕電影，需要的是不同的水平視野角。此工具先把所有規範換成同一個幾何語言，再用你的觀看內容決定「主推薦」。</p>
+        <div class="notice ok">建議先量「眼睛到螢幕表面」距離，不是牆到沙發背、也不是電視櫃到椅背。</div>
+      </div>
+    </section>
+
+    <main class="grid">
+      <aside class="card controls">
+        <h2>輸入條件</h2>
+        <div class="row">
+          <div>
+            <label for="distance">人眼到電視距離</label>
+            <input id="distance" type="number" min="0.1" step="0.1" value="2.5" />
+          </div>
+          <div>
+            <label for="unit">單位</label>
+            <select id="unit">
+              <option value="m" selected>公尺</option>
+              <option value="cm">公分</option>
+              <option value="ft">英尺</option>
+              <option value="in">英吋</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label for="resolution">主要解析度</label>
+            <select id="resolution">
+              <option value="4k" selected>4K / UHD</option>
+              <option value="1080p">1080p / FHD</option>
+              <option value="8k">8K</option>
+            </select>
+          </div>
+          <div>
+            <label for="roomMode">觀看情境</label>
+            <select id="roomMode">
+              <option value="balanced" selected>一般客廳</option>
+              <option value="shared">多人共享</option>
+              <option value="solo">單人沉浸</option>
+              <option value="theater">暗房劇院</option>
+            </select>
+          </div>
+          <div>
+            <label for="rounding">尺寸建議</label>
+            <select id="rounding">
+              <option value="nearest" selected>接近市售尺寸</option>
+              <option value="up">偏大一級</option>
+              <option value="down">偏小一級</option>
+            </select>
+          </div>
+        </div>
+
+        <label>內容偏好</label>
+        <div class="btns">
+          <button class="mini" data-preset="news">新聞 / 第四台</button>
+          <button class="mini" data-preset="youtube">YouTube / 綜藝</button>
+          <button class="mini" data-preset="streaming">Netflix / 劇集</button>
+          <button class="mini" data-preset="cinema">電影優先</button>
+          <button class="mini" data-preset="scope">21:9 電影</button>
+          <button class="mini" data-preset="mixed">混合使用</button>
+        </div>
+        <div class="sliders" id="sliders"></div>
+
+        <div class="row">
+          <div>
+            <label for="currentTv">目前或候選電視尺寸，可留白</label>
+            <input id="currentTv" type="number" min="0" step="1" placeholder="例如 65" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="primary" id="copyBtn" type="button">複製摘要</button>
+          </div>
+        </div>
+        <div class="btns">
+          <button id="printBtn" type="button">列印 / 存成 PDF</button>
+          <button id="resetBtn" type="button">重設</button>
+        </div>
+      </aside>
+
+      <section>
+        <div class="resultHero">
+          <div class="metric">
+            <div class="k">主推薦斜對角</div>
+            <div class="v"><span id="mainDiag">—</span> 吋</div>
+            <div class="note" id="mainNote">—</div>
+          </div>
+          <div class="metric">
+            <div class="k">加權目標水平視野</div>
+            <div class="v"><span id="mainFov">—</span>°</div>
+            <div class="note" id="fovNote">—</div>
+          </div>
+        </div>
+
+        <div id="adviceBox"></div>
+
+        <div class="card canvasBox">
+          <canvas id="viz" width="960" height="320" aria-label="觀看距離與螢幕視角示意圖"></canvas>
+        </div>
+
+        <div class="card">
+          <h2>各標準與品牌模型換算</h2>
+          <p class="footer">所有結果皆換算成 16:9 電視斜對角；「角度」為螢幕寬度佔據的水平視野角。</p>
+          <div style="overflow:auto;max-height:640px;border-radius:16px;border:1px solid var(--line)">
+            <table>
+              <thead>
+                <tr>
+                  <th>模型</th>
+                  <th>方法</th>
+                  <th>建議尺寸</th>
+                  <th>水平視野</th>
+                  <th>解讀</th>
+                </tr>
+              </thead>
+              <tbody id="standardsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <h2>21:9 電影在 16:9 電視上的實際畫面</h2>
+            <div id="scopeBox">—</div>
+          </div>
+          <div class="card">
+            <h2>目前 / 候選尺寸檢查</h2>
+            <div id="currentBox">輸入目前或候選電視尺寸後，這裡會顯示它在你座位上的視野角與內容適配性。</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>詳細算法</h2>
+          <details open>
+            <summary>1. 以水平視野角推回螢幕寬度</summary>
+            <p>設觀看距離為 <code>d</code>、目標水平視野角為 <code>θ</code>，則螢幕寬度：</p>
+            <p><code>width = 2 × d × tan(θ / 2)</code></p>
+          </details>
+          <details open>
+            <summary>2. 16:9 寬高與斜對角換算</summary>
+            <p>16:9 螢幕的寬度係數為 <code>16 / √(16² + 9²)</code>，高度係數為 <code>9 / √(16² + 9²)</code>。</p>
+            <p><code>diagonal = width ÷ (16 / √337)</code></p>
+            <p><code>height = diagonal × (9 / √337)</code></p>
+          </details>
+          <details open>
+            <summary>3. 以「幾倍畫面高度」推回斜對角</summary>
+            <p>部分規範使用畫面高度 <code>H</code>，例如 <code>d = 3.1H</code> 或 <code>d = 1.5H</code>。換成 16:9 斜對角：</p>
+            <p><code>diagonal = d ÷ (heightMultiple × 9 / √337)</code></p>
+          </details>
+          <details open>
+            <summary>4. 21:9 / 2.39:1 電影黑邊與有效高度</summary>
+            <p>在 16:9 電視上播放 2.39:1 電影時，畫面通常吃滿寬度；有效畫面高度為：</p>
+            <p><code>activeHeight = screenWidth ÷ 2.39</code></p>
+            <p>因為 16:9 高度是 <code>screenWidth ÷ 1.777…</code>，所以 2.39:1 內容的有效高度約為 16:9 滿版高度的 <code>1.777 / 2.39 ≈ 74.4%</code>。這就是為什麼電影優先時，通常可以接受更大的電視。</p>
+          </details>
+        </div>
+
+        <div class="card">
+          <h2>標準與品牌說明</h2>
+          <div id="explain"></div>
+        </div>
+
+        <div class="card">
+          <h2>來源與限制</h2>
+          <ul class="sourceList">
+            <li>SMPTE ST 2080-3:2017：HDTV 參考觀看環境，標示 3–3.2 倍畫面高度與觀察位置角度限制。<br><a href="https://pub.smpte.org/pub/st2080-3/st2080-3-2017.pdf">pub.smpte.org/st2080-3</a></li>
+            <li>SMPTE EG 18-1994：歷史劇院設計指南，包含約 30° 水平視野論述；該文件已被 SMPTE 撤回，不應視為現行強制規範。<br><a href="https://pub.smpte.org/pub/eg18/eg0018-1994_withdrawn2003.pdf">pub.smpte.org/eg18</a></li>
+            <li>THX Certified Screen Placement：劇院遠端座位 36° 水平觀看角。<br><a href="https://www.thx.com/questions/thx-certified-screen-placement/">thx.com/questions/thx-certified-screen-placement</a></li>
+            <li>THX Living Room TV Size：距離英吋 × 0.835 推估電視尺寸。<br><a href="https://www.thx.com/questions/what-size-tv-should-i-buy-for-my-living-room/">thx.com/questions/what-size-tv-should-i-buy-for-my-living-room</a></li>
+            <li>Dolby Home Cinema Setup：觀看距離英吋 ÷ 1.5 = 建議螢幕尺寸，並建議觀眾面向螢幕且靠近中心線。<br><a href="https://www.dolby.com/en-gb/about/support/guide/home-theater-setup/">dolby.com/home-theater-setup</a></li>
+            <li>Samsung 台灣 / Gulf：40° 視野與螢幕尺寸 × 1.2 的觀看距離。<br><a href="https://www.samsung.com/tw/tvs/tv-buying-guide/what-size-tv-should-i-get/">samsung.com/tw</a></li>
+            <li>LG 香港：大尺寸指南採 40° 與尺寸 × 1.2；另有一般尺寸指南引用 SMPTE 30° 與 1.2–1.6 倍距離。<br><a href="https://www.lg.com/hk/tv-soundbars/tv-buying-guide/tv-size/">lg.com/hk</a></li>
+            <li>Sony USA：4K 建議距離為 1.5 倍垂直畫面高度；HD 為 3 倍垂直畫面高度。<br><a href="https://www.sony.com/electronics/support/articles/00008601">sony.com</a></li>
+            <li>Panasonic UK / Malaysia：4K 可更近；UK 以 4K 約 1–1.5 倍斜對角、FHD 約 1.5–2.5 倍斜對角；Malaysia 以 FHD 3H、4K 1.5H 說明。<br><a href="https://www.panasonic.com/uk/consumer/televisions-learn/televisions/tv-size-to-distance-calculator-how-to-find-the-perfect-size-tv.html">panasonic.com/uk</a></li>
+            <li>TCL 香港：引用 40° 視野，並以螢幕尺寸 × 1.2 得出觀看距離。<br><a href="https://www.tcl.com/hk/en/tv-size-guide">tcl.com/hk</a></li>
+            <li>Toshiba TV：官方購買指南提供以觀看距離與解析度為輸入的尺寸計算器；公開頁面資料抽取不穩定，因此本工具列為參考，不把它硬編成連續公式。<br><a href="https://toshiba-tv.com/de-en/buying-guide">toshiba-tv.com</a></li>
+          </ul>
+          <div class="notice">本工具是決策輔助，不取代實際店面距離試看。眩光、字幕大小、家具配置、多人側坐、牆面寬度、音響擺位、預算與個人視覺敏感度都會改變最終選擇。</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+(() => {
+  const SQ337 = Math.sqrt(337);
+  const W_PER_DIAG = 16 / SQ337;
+  const H_PER_DIAG = 9 / SQ337;
+  const CM_PER_IN = 2.54;
+  const commercial = [32,40,42,43,48,50,55,58,65,70,75,77,83,85,86,98,100,110,115,120];
+
+  const contentDefs = [
+    {id:'news', label:'新聞 / 一般電視', angle:28, desc:'資訊型、字幕與跑馬燈多，偏保守。'},
+    {id:'youtube', label:'YouTube / 綜藝', angle:31, desc:'混合鏡頭與 UI 元素，接近舒適通用。'},
+    {id:'netflix', label:'Netflix / 劇集', angle:34, desc:'長時間觀看仍保有沉浸感。'},
+    {id:'sports', label:'運動 / 遊戲', angle:36, desc:'追求臨場與速度，但仍需注意多人觀看。'},
+    {id:'movie16', label:'16:9 電影 / 紀錄片', angle:38, desc:'偏劇院感，適合 4K 且畫質來源較好。'},
+    {id:'scope21', label:'21:9 寬銀幕電影', angle:42, desc:'2.39:1 內容有效高度較低，主觀上可接受更大水平視野。'}
+  ];
+
+  const presets = {
+    news:{news:70,youtube:20,netflix:10,sports:0,movie16:0,scope21:0},
+    youtube:{news:10,youtube:65,netflix:15,sports:10,movie16:0,scope21:0},
+    streaming:{news:5,youtube:15,netflix:55,sports:5,movie16:15,scope21:5},
+    cinema:{news:0,youtube:5,netflix:20,sports:5,movie16:35,scope21:35},
+    scope:{news:0,youtube:0,netflix:10,sports:0,movie16:15,scope21:75},
+    mixed:{news:20,youtube:25,netflix:25,sports:10,movie16:10,scope21:10}
+  };
+
+  const models = [
+    {id:'smpte2080', label:'SMPTE ST 2080-3 參考觀看', method:'3.0–3.2H；本表用 3.1H', type:'height', h:3.1, tag:'正式參考環境', note:'偏保守，適合彩準、長時間觀看與明確工作環境。'},
+    {id:'smpte30', label:'SMPTE EG-18 歷史劇院下限', method:'約 30° 水平視野', type:'angle', angle:30, tag:'歷史 / 已撤回', warn:true, note:'常被當作家庭劇院保守下限，但原文件已撤回，僅保留為歷史參考。'},
+    {id:'dolby', label:'Dolby Home Cinema', method:'尺寸 = 距離 ÷ 1.5', type:'diagByDistanceDiv', divisor:1.5, tag:'家庭影院', note:'接近 32° 水平視野；Dolby 同時強調正面、靠中心線觀看。'},
+    {id:'thx36', label:'THX Certified Cinema Placement', method:'36° 水平視野', type:'angle', angle:36, tag:'劇院沉浸', note:'THX 劇院設計建議遠端座位仍有 36°，沉浸感較強。'},
+    {id:'thx835', label:'THX Living Room TV', method:'尺寸 = 距離 × 0.835', type:'diagMultiplier', mult:0.835, tag:'家用沉浸', note:'約等於 40° 水平視野，適合 4K 與電影／遊戲比重高的客廳。'},
+    {id:'brand40', label:'Samsung / LG / TCL 40° 大螢幕法', method:'40°；亦約等於距離 = 尺寸 × 1.2', type:'angle', angle:40, tag:'品牌主流大螢幕', note:'多家品牌的大螢幕指南採此方向；主觀沉浸強，但要確認空間與多人側視。'},
+    {id:'sony4k', label:'Sony / Panasonic 4K 解析度界線', method:'1.5H', type:'height', h:1.5, tag:'4K 近距離上限', note:'這是像素可見度導向，不是舒適度導向；通常會得到很大的尺寸。'},
+    {id:'sonyhd', label:'Sony / Panasonic HD 解析度界線', method:'3H', type:'height', h:3.0, tag:'HD / FHD 保守', note:'若主要看 1080p、低碼率串流或有線電視，這個尺寸附近較不易暴露畫質缺陷。'},
+    {id:'panasonic4krange', label:'Panasonic UK 4K 區間', method:'距離 = 尺寸 × 1.0–1.5', type:'diagRange', minDiv:1.5, maxDiv:1.0, tag:'4K 區間', note:'用斜對角倍數表達，範圍很寬；偏預算與個人喜好導向。'},
+    {id:'panasonicfhdrange', label:'Panasonic UK FHD 區間', method:'距離 = 尺寸 × 1.5–2.5', type:'diagRange', minDiv:2.5, maxDiv:1.5, tag:'FHD 區間', note:'Full HD 建議坐遠一些，避免像素與壓縮瑕疵。'},
+    {id:'toshiba', label:'Toshiba TV 購買指南', method:'距離 + 解析度分類計算器', type:'categorical', tag:'分類參考', note:'官方提供以觀看距離與解析度為輸入的 calculator；非連續公式，這裡只做策略參考。'}
+  ];
+
+  const explanations = [
+    ['SMPTE ST 2080-3', '這是 HDTV 圖像評估的參考觀看環境，不是一般消費者客廳指南。它使用 3–3.2 倍畫面高度作為名目觀看距離，因此換算後通常落在舒適、偏保守的尺寸。'],
+    ['SMPTE EG-18', '歷史上常被引用為 30° 水平視野下限，但該工程指南已被 SMPTE 撤回。工具仍保留，是因為它已成為家庭劇院討論中的常見參考點；介面中明確標示為歷史參考。'],
+    ['THX 36° / 0.835', 'THX 劇院配置文件提到遠端座位 36°；THX 家用電視 FAQ 則給出「距離英吋 × 0.835」的尺寸法，幾何上約等於 40° 水平視野，是更沉浸的家用大螢幕取向。'],
+    ['Dolby Home Cinema', 'Dolby 家庭影院指南使用「觀看距離 ÷ 1.5 = 螢幕尺寸」這個簡單規則，結果大約對應 32° 水平視野，接近 SMPTE ST 2080-3 的保守舒適區。'],
+    ['Samsung / LG / TCL', '多個品牌的大尺寸購買指南以 40° 視野或「尺寸 × 1.2 = 觀看距離」說明，這和 THX 0.835 幾乎相同，代表品牌端更願意把 4K 時代的客廳推向較大尺寸。'],
+    ['Sony / Panasonic 解析度高度法', 'Sony 與 Panasonic 的 1.5H / 3H 說法主要是像素可辨識與解析度導向。它能回答「這麼近會不會看見像素」，但不完全等同「長時間舒不舒服」。'],
+    ['21:9 電影偏好', '2.39:1 電影在 16:9 電視上高度只有滿版 16:9 的約 74.4%。若你看很多寬銀幕電影，同樣的斜對角會覺得畫面高度不足，因此主推薦會提高目標水平視野。']
+  ];
+
+  const $ = id => document.getElementById(id);
+  const fmt = (n, d=1) => Number.isFinite(n) ? n.toFixed(d) : '—';
+  const rad = deg => deg * Math.PI / 180;
+  const deg = r => r * 180 / Math.PI;
+
+  function distInches(){
+    const v = Math.max(0.01, parseFloat($('distance').value || '0'));
+    const u = $('unit').value;
+    if(u === 'm') return v * 39.3700787;
+    if(u === 'cm') return v / 2.54;
+    if(u === 'ft') return v * 12;
+    return v;
+  }
+  function diagFromAngle(d, angle){ return (2 * d * Math.tan(rad(angle/2))) / W_PER_DIAG; }
+  function diagFromHeight(d, hMult){ return d / (hMult * H_PER_DIAG); }
+  function angleFromDiag(d, diag){ return deg(2 * Math.atan((diag * W_PER_DIAG) / (2*d))); }
+  function dims(diag){ return {w:diag*W_PER_DIAG, h:diag*H_PER_DIAG, cmW:diag*W_PER_DIAG*CM_PER_IN, cmH:diag*H_PER_DIAG*CM_PER_IN}; }
+  function nearestSizes(diag){
+    const sorted = [...commercial].sort((a,b)=>Math.abs(a-diag)-Math.abs(b-diag));
+    return sorted.slice(0,3).sort((a,b)=>a-b);
+  }
+  function pickCommercial(diag){
+    const mode = $('rounding').value;
+    if(mode === 'up') return commercial.find(s => s >= diag) || commercial[commercial.length-1];
+    if(mode === 'down') return [...commercial].reverse().find(s => s <= diag) || commercial[0];
+    return nearestSizes(diag)[1] || nearestSizes(diag)[0];
+  }
+  function getWeights(){
+    const out = {};
+    contentDefs.forEach(c => { out[c.id] = parseFloat($(c.id).value || '0'); });
+    return out;
+  }
+  function setPreset(name){
+    const p = presets[name] || presets.mixed;
+    contentDefs.forEach(c => { $(c.id).value = p[c.id] ?? 0; });
+    update();
+  }
+  function targetAngle(){
+    const w = getWeights();
+    let total = 0, sum = 0;
+    contentDefs.forEach(c => { total += w[c.id]; sum += w[c.id] * c.angle; });
+    if(total <= 0) return 34;
+    let a = sum / total;
+    const mode = $('roomMode').value;
+    if(mode === 'shared') a -= 1.5;
+    if(mode === 'solo') a += 1;
+    if(mode === 'theater') a += 2;
+    return Math.max(26, Math.min(46, a));
+  }
+  function contentSummary(){
+    const w = getWeights();
+    const entries = contentDefs.filter(c => w[c.id] > 0).sort((a,b)=>w[b.id]-w[a.id]).slice(0,3);
+    return entries.map(c => `${c.label} ${w[c.id]}%`).join('、') || '未設定';
+  }
+  function modelDiag(m, d){
+    if(m.type === 'angle') return {text:null, diag:diagFromAngle(d,m.angle), angle:m.angle};
+    if(m.type === 'height') { const dg = diagFromHeight(d,m.h); return {diag:dg, angle:angleFromDiag(d,dg)}; }
+    if(m.type === 'diagMultiplier') { const dg = d*m.mult; return {diag:dg, angle:angleFromDiag(d,dg)}; }
+    if(m.type === 'diagByDistanceDiv') { const dg = d/m.divisor; return {diag:dg, angle:angleFromDiag(d,dg)}; }
+    if(m.type === 'diagRange') {
+      const a = d/m.minDiv, b = d/m.maxDiv;
+      return {range:[a,b], angleRange:[angleFromDiag(d,a),angleFromDiag(d,b)]};
+    }
+    return {categorical:true};
+  }
+  function scopeStats(diag){
+    const di = dims(diag);
+    const activeH = di.w / 2.39;
+    const activeDiag = Math.sqrt(di.w*di.w + activeH*activeH);
+    const blackEach = Math.max(0,(di.h-activeH)/2);
+    return {screenW:di.w, screenH:di.h, activeH, activeDiag, blackEach, activeHeightRatio:activeH/di.h};
+  }
+  function sliderUI(){
+    const box = $('sliders');
+    box.innerHTML = '';
+    contentDefs.forEach(c => {
+      const line = document.createElement('div');
+      line.className = 'sliderLine';
+      line.innerHTML = `<span title="${c.desc}">${c.label}</span><input id="${c.id}" type="range" min="0" max="100" step="5"><strong id="${c.id}Val">0%</strong>`;
+      box.appendChild(line);
+    });
+    contentDefs.forEach(c => $(c.id).addEventListener('input', update));
+    setPreset('mixed');
+  }
+  function updateSliderLabels(){ contentDefs.forEach(c => $(c.id+'Val').textContent = `${$(c.id).value}%`); }
+
+  function standardsTable(d, mainDiag){
+    const rows = models.map(m => {
+      const r = modelDiag(m,d);
+      let sizeTxt, angleTxt, barPct;
+      if(r.range){
+        sizeTxt = `${fmt(r.range[0],0)}–${fmt(r.range[1],0)} 吋`;
+        angleTxt = `${fmt(r.angleRange[0],1)}–${fmt(r.angleRange[1],1)}°`;
+        barPct = Math.min(100, r.range[1] / Math.max(mainDiag, r.range[1], 115) * 100);
+      } else if(r.categorical){
+        sizeTxt = $('resolution').value === '4k' ? '依距離區間查表' : '依 HD / 4K 查表';
+        angleTxt = '—';
+        barPct = 12;
+      } else {
+        const near = nearestSizes(r.diag).join(' / ');
+        sizeTxt = `<strong>${fmt(r.diag,1)} 吋</strong><div class="footer">近似市售：${near} 吋</div><div class="barwrap"><div class="bar" style="width:${Math.min(100, r.diag / Math.max(mainDiag, r.diag, 115) * 100)}%"></div></div>`;
+        angleTxt = `${fmt(r.angle,1)}°`;
+      }
+      const tagClass = m.warn ? 'warn' : (m.id === 'brand40' || m.id === 'thx835' ? 'oktag' : '');
+      return `<tr>
+        <td><strong>${m.label}</strong><br><span class="tag ${tagClass}">${m.tag}</span></td>
+        <td>${m.method}</td>
+        <td>${sizeTxt}</td>
+        <td>${angleTxt}</td>
+        <td>${m.note}</td>
+      </tr>`;
+    }).join('');
+    $('standardsBody').innerHTML = rows;
+  }
+
+  function advice(d, diag, chosen, angle){
+    const res = $('resolution').value;
+    const dim = dims(chosen);
+    const hdMax = diagFromHeight(d,3.0);
+    const sony4k = diagFromHeight(d,1.5);
+    const near = nearestSizes(diag);
+    let html = `<div class="notice ok"><strong>建議購買落點：</strong>精算值約 ${fmt(diag,1)} 吋；依市售尺寸與你的四捨五入策略，優先看 <strong>${chosen} 吋</strong>。可交叉比較 ${near.join(' / ')} 吋。${chosen >= 85 ? ' 85 吋以上請務必確認牆面寬度、搬運、電梯與觀看高度。' : ''}</div>`;
+    if(res === '1080p' && chosen > hdMax*1.08){
+      html += `<div class="notice danger"><strong>畫質風險：</strong>若主要來源是 1080p、有線電視或低碼率串流，${chosen} 吋在此距離可能放大壓縮瑕疵。以 3H 解析度界線估算，較保守上限約 ${fmt(hdMax,0)} 吋。</div>`;
+    } else if(res === '4k' && chosen > sony4k*0.95){
+      html += `<div class="notice"><strong>非常激進：</strong>${chosen} 吋已接近 4K 像素可見度導向的近距離上限。除非你偏好前排劇院感，否則建議實際試看字幕與運動畫面。</div>`;
+    }
+    if(angle >= 40){
+      html += `<div class="notice"><strong>沉浸感高：</strong>${fmt(angle,1)}° 屬於 THX 0.835 / 品牌 40° 等級。適合高畫質電影、遊戲與 4K 串流，但多人側坐與字幕閱讀要現場確認。</div>`;
+    }
+    html += `<div class="footer">${chosen} 吋 16:9 約寬 ${fmt(dim.cmW,0)} 公分、高 ${fmt(dim.cmH,0)} 公分；實際型號還要加上邊框、底座與安裝間隙。</div>`;
+    $('adviceBox').innerHTML = html;
+  }
+
+  function scopeBox(diag){
+    const s = scopeStats(diag);
+    const pct = s.activeHeightRatio * 100;
+    $('scopeBox').innerHTML = `
+      <p>以主推薦尺寸播放 2.39:1 電影時，畫面吃滿寬度但上下留黑邊：</p>
+      <table>
+        <tr><th>16:9 螢幕寬</th><td>${fmt(s.screenW*CM_PER_IN,0)} 公分</td></tr>
+        <tr><th>16:9 螢幕高</th><td>${fmt(s.screenH*CM_PER_IN,0)} 公分</td></tr>
+        <tr><th>2.39:1 有效畫面高</th><td>${fmt(s.activeH*CM_PER_IN,0)} 公分，約為滿版高度的 ${fmt(pct,1)}%</td></tr>
+        <tr><th>上下黑邊</th><td>每邊約 ${fmt(s.blackEach*CM_PER_IN,1)} 公分</td></tr>
+        <tr><th>有效畫面斜對角</th><td>${fmt(s.activeDiag,1)} 吋</td></tr>
+      </table>
+      <div class="notice">若 21:9 電影佔比很高，請不要只看名義斜對角；有效畫面高度才是「電影看起來夠不夠大」的關鍵。</div>`;
+  }
+
+  function currentBox(d){
+    const val = parseFloat($('currentTv').value || '0');
+    if(!val){ $('currentBox').innerHTML = '輸入目前或候選電視尺寸後，這裡會顯示它在你座位上的視野角與內容適配性。'; return; }
+    const a = angleFromDiag(d,val);
+    const s = scopeStats(val);
+    let band = '舒適通用';
+    if(a < 28) band = '偏小、資訊型';
+    else if(a < 33) band = '保守舒適';
+    else if(a < 38) band = '平衡沉浸';
+    else if(a < 42) band = '劇院沉浸';
+    else band = '前排劇院感';
+    $('currentBox').innerHTML = `
+      <p><strong>${val} 吋</strong> 在目前距離下約為 <strong>${fmt(a,1)}°</strong> 水平視野，判定為「${band}」。</p>
+      <p>播放 21:9 電影時，有效畫面高度約為 ${fmt(s.activeH*CM_PER_IN,0)} 公分，有效斜對角約 ${fmt(s.activeDiag,1)} 吋。</p>
+      <div class="barwrap"><div class="bar" style="width:${Math.min(100,a/46*100)}%"></div></div>`;
+  }
+
+  function drawViz(d, diag, angle){
+    const canvas = $('viz');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = 'rgba(255,255,255,.03)'; ctx.fillRect(0,0,W,H);
+    const margin = 70;
+    const eyeX = margin, eyeY = H/2;
+    const screenX = W - 165;
+    const maxWidth = 230;
+    const screenW = Math.min(maxWidth, Math.max(50, diag/120*maxWidth));
+    const screenH = screenW * 9 / 16;
+    const sy = eyeY - screenH/2;
+    ctx.strokeStyle = 'rgba(139,211,255,.9)'; ctx.lineWidth = 3;
+    ctx.strokeRect(screenX, sy, screenW, screenH);
+    ctx.fillStyle = 'rgba(139,211,255,.1)'; ctx.fillRect(screenX, sy, screenW, screenH);
+    ctx.beginPath(); ctx.arc(eyeX, eyeY, 14, 0, Math.PI*2); ctx.fillStyle='rgba(184,255,207,.9)'; ctx.fill();
+    ctx.strokeStyle='rgba(184,255,207,.35)'; ctx.lineWidth=8; ctx.beginPath(); ctx.arc(eyeX, eyeY, 25, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.42)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(eyeX, eyeY); ctx.lineTo(screenX, sy); ctx.moveTo(eyeX, eyeY); ctx.lineTo(screenX, sy+screenH); ctx.stroke();
+    ctx.setLineDash([7,7]); ctx.beginPath(); ctx.moveTo(eyeX, eyeY); ctx.lineTo(screenX+screenW/2, eyeY); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#eaf0ff'; ctx.font='24px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'; ctx.fillText(`${fmt(diag,1)}”`, screenX+screenW/2-35, sy-14);
+    ctx.fillStyle='rgba(234,240,255,.78)'; ctx.font='16px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.fillText(`水平視野 ${fmt(angle,1)}°`, eyeX+80, eyeY-30);
+    ctx.fillText(`觀看距離 ${fmt(d,1)} in / ${fmt(d*CM_PER_IN/100,2)} m`, eyeX+80, eyeY+4);
+    ctx.fillText('眼睛', eyeX-18, eyeY+55);
+    ctx.fillText('16:9 螢幕', screenX+screenW/2-43, sy+screenH+30);
+  }
+
+  function explain(){
+    $('explain').innerHTML = explanations.map(([h,p]) => `<details><summary>${h}</summary><p>${p}</p></details>`).join('');
+  }
+
+  function update(){
+    updateSliderLabels();
+    const d = distInches();
+    const a = targetAngle();
+    const dg = diagFromAngle(d,a);
+    const chosen = pickCommercial(dg);
+    const chosenAngle = angleFromDiag(d,chosen);
+    $('mainDiag').textContent = fmt(dg,1);
+    $('mainFov').textContent = fmt(a,1);
+    $('mainNote').textContent = `建議市售落點：${chosen} 吋；內容組合：${contentSummary()}`;
+    $('fovNote').textContent = `${$('roomMode').selectedOptions[0].textContent}；目前距離 ${fmt(d*CM_PER_IN/100,2)} 公尺`;
+    advice(d,dg,chosen,chosenAngle);
+    standardsTable(d,dg);
+    scopeBox(chosen);
+    currentBox(d);
+    drawViz(d,chosen,chosenAngle);
+  }
+
+  function copySummary(){
+    const d = distInches();
+    const a = targetAngle();
+    const dg = diagFromAngle(d,a);
+    const chosen = pickCommercial(dg);
+    const txt = `電視尺寸建議：觀看距離約 ${fmt(d*CM_PER_IN/100,2)} 公尺，內容偏好為 ${contentSummary()}。加權目標水平視野 ${fmt(a,1)}°，16:9 精算斜對角約 ${fmt(dg,1)} 吋，建議優先比較 ${nearestSizes(dg).join(' / ')} 吋，購買落點 ${chosen} 吋。`;
+    navigator.clipboard?.writeText(txt).then(()=>{
+      $('copyBtn').textContent='已複製'; setTimeout(()=>$('copyBtn').textContent='複製摘要',1200);
+    }).catch(()=>alert(txt));
+  }
+
+  function init(){
+    sliderUI();
+    explain();
+    ['distance','unit','resolution','roomMode','rounding','currentTv'].forEach(id => $(id).addEventListener('input',update));
+    document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => setPreset(b.dataset.preset)));
+    $('copyBtn').addEventListener('click', copySummary);
+    $('printBtn').addEventListener('click', () => window.print());
+    $('resetBtn').addEventListener('click', () => { $('distance').value=2.5; $('unit').value='m'; $('resolution').value='4k'; $('roomMode').value='balanced'; $('rounding').value='nearest'; $('currentTv').value=''; setPreset('mixed'); });
+    update();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
