@@ -4,6 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>16:9 電視尺寸計算機｜劇院視角、內容偏好與品牌建議</title>
+  <meta name="description" content="可離線使用的 16:9 電視尺寸計算機，支援劇院視角、內容偏好與品牌建議換算。" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="電視尺寸" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
   <style>
     :root{
       --bg:#0b1020;
@@ -612,6 +619,14 @@
     update();
   }
   init();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(err => {
+        console.warn('Service worker registration failed:', err);
+      });
+    });
+  }
 })();
 </script>
 </body>
