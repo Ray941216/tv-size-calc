@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tv-size-calc-v1';
+const CACHE_NAME = 'tv-size-calc-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,6 +26,11 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const request = event.request;
+
+  // 廣告 / 分析相關請求一律走網路，不攔截、不快取（AdSense 需要即時載入）
+  if(/googlesyndication\.com|googleadservices\.com|doubleclick\.net|google-analytics\.com|googletagservices\.com|adtrafficquality\.google/.test(request.url)){
+    return;
+  }
 
   if(request.mode === 'navigate'){
     event.respondWith(
